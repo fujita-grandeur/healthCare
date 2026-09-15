@@ -1,5 +1,6 @@
-// キャッシュ名はアプリ更新時にバージョンを上げる（古いキャッシュは activate 時に破棄）
-const CACHE_NAME = "health-records-cache-v2";
+// キャッシュ名。オフライン用の保険であり、オンライン時は常にネットワークを優先するため
+// 通常の更新ではこの値を上げる必要はない（古いキャッシュは activate 時に破棄される）
+const CACHE_NAME = "health-records-cache-v3";
 
 const PRECACHE_URLS = [
   "./",
@@ -45,30 +46,18 @@ self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
 
-  // ナビゲーション要求：オンラインなら最新を取得しキャッシュ更新、オフラインならキャッシュを返す
-  if (req.mode === "navigate") {
-    event.respondWith(
-      fetch(req)
-        .then((res) => {
-          caches.open(CACHE_NAME).then((cache) => cache.put("./index.html", res.clone()));
-          return res;
-        })
-        .catch(() => caches.match("./index.html"))
-    );
-    return;
-  }
-
-  // それ以外：キャッシュ優先、なければネットワーク取得しキャッシュへ追加
+  // 常にネットワークを優先し、取得できたら都度キャッシュを更新する。
+  // オフラインの時だけキャッシュ（最後に取得できた内容）にフォールバックする。
+  // これにより、HTML/JS/CSSのどれかだけが古いまま残る不整合が起きない。
   event.respondWith(
-    caches.match(req).then((cached) => {
-      if (cached) return cached;
-      return fetch(req).then((res) => {
-        if (res && res.status === 200 && res.type === "basic") {
+    fetch(req)
+      .then((res) => {
+        if (res && res.status === 200 && (res.type === "basic" || res.type === "default")) {
           const resClone = res.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(req, resClone));
         }
         return res;
-      });
-    })
+      })
+      .catch(() => caches.match(req))
   );
 });
