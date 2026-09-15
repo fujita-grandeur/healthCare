@@ -1,5 +1,5 @@
 // キャッシュ名はアプリ更新時にバージョンを上げる（古いキャッシュは activate 時に破棄）
-const CACHE_NAME = "health-records-cache-v1";
+const CACHE_NAME = "health-records-cache-v2";
 
 const PRECACHE_URLS = [
   "./",

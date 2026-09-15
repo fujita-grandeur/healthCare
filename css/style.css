@@ -36,6 +36,9 @@ body {
     "Yu Gothic", sans-serif;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
+  overscroll-behavior-x: none;
+  /* 横方向にはコンテンツが出ないはずなので、わずかな幅超過でも横スクロール（グラつき）させない */
+  overflow-x: hidden;
 }
 
 body {
@@ -182,6 +185,7 @@ p {
   border-radius: var(--radius-md);
   padding: 12px 8px;
   text-align: center;
+  min-width: 0;
 }
 
 .metric-tile .metric-label {
@@ -214,6 +218,7 @@ p {
   font-size: 11px;
   color: var(--color-text-muted);
   margin-top: 2px;
+  overflow-wrap: break-word;
 }
 
 /* ---------- ダッシュボード：検査結果 ---------- */
@@ -227,6 +232,7 @@ p {
   background: var(--color-surface-alt);
   border-radius: var(--radius-md);
   padding: 14px 12px;
+  min-width: 0;
 }
 
 .lab-tile .metric-label {
