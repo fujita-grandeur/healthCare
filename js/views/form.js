@@ -9,6 +9,7 @@ import {
 let currentMode = "create"; // "create" | "edit"
 let currentRecord = null;
 let onSavedCallback = null;
+let labelInputEl = null; // ラベル対応グループ（血圧等）の入力欄への参照
 
 const overlay = document.getElementById("modal-form");
 const titleEl = document.getElementById("form-title");
@@ -22,8 +23,50 @@ function formatValueForHint(field, value) {
   return field.decimals > 0 ? Number(value).toFixed(field.decimals) : String(Math.round(value));
 }
 
+function buildLabelRow(group) {
+  const row = document.createElement("div");
+  row.className = "label-row";
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.id = "input-label-" + group.key;
+  input.className = "label-text-input";
+  input.placeholder = "ラベル（任意）例：朝・夜など";
+  input.maxLength = 20;
+  input.value = (currentRecord && currentRecord.label) || "";
+
+  const chipRow = document.createElement("div");
+  chipRow.className = "label-chip-row";
+
+  function syncChipActive() {
+    for (const chip of chipRow.querySelectorAll(".label-chip")) {
+      chip.classList.toggle("active", chip.textContent === input.value);
+    }
+  }
+
+  for (const preset of group.labelPresets) {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "chip label-chip";
+    chip.textContent = preset;
+    chip.addEventListener("click", () => {
+      input.value = input.value === preset ? "" : preset;
+      syncChipActive();
+    });
+    chipRow.appendChild(chip);
+  }
+  input.addEventListener("input", syncChipActive);
+  syncChipActive();
+
+  row.appendChild(chipRow);
+  row.appendChild(input);
+  labelInputEl = input;
+  return row;
+}
+
 async function buildFields() {
   fieldsContainer.innerHTML = "";
+  labelInputEl = null;
   const allRecords = await getAllRecords(); // 降順、前回値検索に使う
 
   for (const group of FIELD_GROUPS) {
@@ -39,6 +82,10 @@ async function buildFields() {
 
     const card = document.createElement("div");
     card.className = "card";
+
+    if (group.supportsLabel) {
+      card.appendChild(buildLabelRow(group));
+    }
 
     for (const field of group.fields) {
       const row = document.createElement("div");
@@ -150,11 +197,12 @@ form.addEventListener("submit", async (e) => {
   }
 
   const measuredAt = datetimeLocalToIso(measuredAtInput.value);
+  const label = labelInputEl ? labelInputEl.value.trim() : "";
 
   if (currentMode === "create") {
-    await addRecord(measuredAt, values);
+    await addRecord(measuredAt, values, label);
   } else {
-    await updateRecord(currentRecord.id, measuredAt, values);
+    await updateRecord(currentRecord.id, measuredAt, values, label);
   }
 
   hide();

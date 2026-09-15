@@ -340,6 +340,39 @@ p {
   flex-shrink: 0;
 }
 
+.label-row {
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.label-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.label-chip {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.label-text-input {
+  width: 100%;
+  font-size: 14px;
+  padding: 10px 10px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+}
+
+.label-text-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+}
+
 .datetime-row {
   margin-bottom: 6px;
 }
@@ -460,6 +493,18 @@ p {
   color: var(--color-text-muted);
   font-weight: 500;
   margin-right: 2px;
+}
+
+.history-label-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-primary-contrast);
+  background: var(--color-primary);
+  border-radius: 999px;
+  vertical-align: middle;
 }
 
 .empty-state {

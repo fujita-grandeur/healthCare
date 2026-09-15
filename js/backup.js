@@ -35,16 +35,23 @@ export async function exportJson() {
   downloadBlob(json, `health-records-${timestampForFilename()}.json`, "application/json");
 }
 
+function csvField(value) {
+  const s = String(value);
+  if (/[",\n]/.test(s)) {
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
+
 export async function exportCsv() {
   const records = await getAllRecords();
   const ascending = [...records].reverse();
 
-  const headers = ["measuredAt", ...ALL_FIELDS.map((f) => f.key)];
-  const headerLabels = ["測定日時", ...ALL_FIELDS.map((f) => `${f.label}(${f.unit})`)];
+  const headerLabels = ["測定日時", "ラベル", ...ALL_FIELDS.map((f) => `${f.label}(${f.unit})`)];
 
   const rows = [headerLabels.join(",")];
   for (const r of ascending) {
-    const cols = [formatDateTime(r.measuredAt)];
+    const cols = [formatDateTime(r.measuredAt), csvField(r.label || "")];
     for (const f of ALL_FIELDS) {
       const v = r.values[f.key];
       cols.push(v === undefined || v === null ? "" : String(v));

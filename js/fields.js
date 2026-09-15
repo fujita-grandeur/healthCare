@@ -3,9 +3,12 @@
 
 export const FIELD_GROUPS = [
   {
-    key: "daily",
-    label: "日常の記録",
-    description: "血圧・脈拍・体重",
+    key: "bloodPressure",
+    label: "血圧・脈拍",
+    description: "血圧・脈拍",
+    // 血圧は測定タイミングで値が変わりやすいため、朝/夜などのラベルを付けられる
+    supportsLabel: true,
+    labelPresets: ["朝", "昼", "夜", "起床直後", "就寝前"],
     fields: [
       {
         key: "systolic",
@@ -34,6 +37,13 @@ export const FIELD_GROUPS = [
         max: 260,
         decimals: 0,
       },
+    ],
+  },
+  {
+    key: "weight",
+    label: "体重",
+    description: "体重",
+    fields: [
       {
         key: "weight",
         label: "体重",
@@ -46,9 +56,9 @@ export const FIELD_GROUPS = [
     ],
   },
   {
-    key: "labs",
-    label: "検査結果",
-    description: "HbA1c・尿酸値（数ヶ月に1回程度）",
+    key: "hba1c",
+    label: "HbA1c",
+    description: "HbA1c（数ヶ月に1回程度）",
     fields: [
       {
         key: "hba1c",
@@ -59,6 +69,13 @@ export const FIELD_GROUPS = [
         max: 16,
         decimals: 1,
       },
+    ],
+  },
+  {
+    key: "uricAcid",
+    label: "尿酸値",
+    description: "尿酸値（数ヶ月に1回程度）",
+    fields: [
       {
         key: "uricAcid",
         label: "尿酸値",

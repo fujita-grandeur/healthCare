@@ -6,6 +6,16 @@ function formatValue(field, value) {
   return field.decimals > 0 ? Number(value).toFixed(field.decimals) : String(Math.round(value));
 }
 
+function escapeHtml(str) {
+  return str.replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  })[c]);
+}
+
 function renderDailyTile(key, latestToday) {
   const field = getField(key);
   const record = latestToday;
@@ -41,10 +51,11 @@ function renderBloodPressureTile(latestToday) {
     `;
   } else {
     tile.className = "metric-tile";
+    const labelSuffix = latestToday.label ? ` · ${escapeHtml(latestToday.label)}` : "";
     tile.innerHTML = `
       <div class="metric-label">血圧</div>
       <div class="metric-value">${sys ?? "-"}/${dia ?? "-"}<span class="unit">mmHg</span></div>
-      <div class="metric-time">${formatTime(latestToday.measuredAt)}</div>
+      <div class="metric-time">${formatTime(latestToday.measuredAt)}${labelSuffix}</div>
     `;
   }
   return tile;

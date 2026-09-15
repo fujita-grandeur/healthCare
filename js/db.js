@@ -31,7 +31,7 @@ function genId() {
   return "id-" + Date.now() + "-" + Math.random().toString(16).slice(2);
 }
 
-export async function addRecord(measuredAt, values) {
+export async function addRecord(measuredAt, values, label) {
   const db = await openDb();
   const now = new Date().toISOString();
   const record = {
@@ -40,6 +40,7 @@ export async function addRecord(measuredAt, values) {
     createdAt: now,
     updatedAt: now,
     values,
+    label: label || null,
   };
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_RECORDS, "readwrite");
@@ -49,7 +50,7 @@ export async function addRecord(measuredAt, values) {
   });
 }
 
-export async function updateRecord(id, measuredAt, values) {
+export async function updateRecord(id, measuredAt, values, label) {
   const db = await openDb();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_RECORDS, "readwrite");
@@ -65,6 +66,7 @@ export async function updateRecord(id, measuredAt, values) {
         ...existing,
         measuredAt,
         values,
+        label: label || null,
         updatedAt: new Date().toISOString(),
       };
       store.put(updated);
