@@ -4,6 +4,8 @@ import {
   toDatetimeLocalValue,
   datetimeLocalToIso,
   isoToDatetimeLocalValue,
+  splitDatetimeLocalValue,
+  joinDateTimeValue,
 } from "../utils/date.js";
 
 let currentMode = "create"; // "create" | "edit"
@@ -13,7 +15,8 @@ let labelInputEl = null; // ラベル対応グループ（血圧等）の入力�
 
 const overlay = document.getElementById("modal-form");
 const titleEl = document.getElementById("form-title");
-const measuredAtInput = document.getElementById("form-measured-at");
+const measuredDateInput = document.getElementById("form-measured-date");
+const measuredTimeInput = document.getElementById("form-measured-time");
 const fieldsContainer = document.getElementById("form-fields-container");
 const form = document.getElementById("record-form");
 const deleteBtn = document.getElementById("form-delete-btn");
@@ -151,7 +154,9 @@ export async function openCreateForm(onSaved) {
   onSavedCallback = onSaved;
   titleEl.textContent = "記録する";
   deleteBtn.classList.add("hidden");
-  measuredAtInput.value = toDatetimeLocalValue(new Date());
+  const { date, time } = splitDatetimeLocalValue(toDatetimeLocalValue(new Date()));
+  measuredDateInput.value = date;
+  measuredTimeInput.value = time;
   await buildFields();
   show();
 }
@@ -162,7 +167,9 @@ export async function openEditForm(record, onSaved) {
   onSavedCallback = onSaved;
   titleEl.textContent = "記録を編集";
   deleteBtn.classList.remove("hidden");
-  measuredAtInput.value = isoToDatetimeLocalValue(record.measuredAt);
+  const { date, time } = splitDatetimeLocalValue(isoToDatetimeLocalValue(record.measuredAt));
+  measuredDateInput.value = date;
+  measuredTimeInput.value = time;
   await buildFields();
   show();
 }
@@ -196,7 +203,9 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  const measuredAt = datetimeLocalToIso(measuredAtInput.value);
+  const measuredAt = datetimeLocalToIso(
+    joinDateTimeValue(measuredDateInput.value, measuredTimeInput.value)
+  );
   const label = labelInputEl ? labelInputEl.value.trim() : "";
 
   if (currentMode === "create") {

@@ -32,6 +32,18 @@ export function isoToDatetimeLocalValue(iso) {
   return toDatetimeLocalValue(d);
 }
 
+// "YYYY-MM-DDTHH:mm" -> { date: "YYYY-MM-DD", time: "HH:mm" }
+// iOSのdatetime-local入力は幅が広くなりすぎるため、日付/時刻を別々のinputに分けて表示する
+export function splitDatetimeLocalValue(value) {
+  const [date, time] = value.split("T");
+  return { date, time };
+}
+
+// { date, time } -> "YYYY-MM-DDTHH:mm"
+export function joinDateTimeValue(date, time) {
+  return `${date}T${time}`;
+}
+
 // ISO文字列 -> "2026/08/13 07:30" 表示用
 export function formatDateTime(iso) {
   const d = new Date(iso);
